@@ -48,11 +48,9 @@ class HyperloglogCounter:
 
     #return h_p as an integer and h^p as binaryString
     def h(self, x):
-        binaryString = bin(int.from_bytes(hashlib.sha256(f"{x}".encode('utf8')).digest(), 'little'))
-        start = 3
-        p_prime = start + self.b # binary strings start with 0b so we have to account for that and it appears that the string always starts with 1 which breaks the algorithm completely
-        h_p = int(binaryString[start:p_prime], 2)
-        hp = binaryString[p_prime:] 
+        binaryString = '{:0256b}'.format(int.from_bytes(hashlib.sha256(f"{x}".encode('utf8')).digest(), 'little'))
+        h_p = int(binaryString[:self.b], 2)
+        hp = binaryString[self.b:]
         return h_p, hp
 
     def pplus(self, h):
@@ -68,7 +66,7 @@ class HyperloglogCounter:
         self.M[i] = max(self.M.get(i, 0),self.pplus(h))
 
     def size(self):
-        if len(self.M) != self.p:
+        if len(self.M) != self.p:   # Because in the algorithm it is specified that initially all M[i] are set to -inf
             Z = 0
         else:
             Z = np.sum(list(map(lambda x: 2**-x, self.M.values())))
