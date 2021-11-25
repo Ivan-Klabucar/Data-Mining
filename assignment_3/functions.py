@@ -1,4 +1,3 @@
-from functools import update_wrapper
 import hashlib
 import numpy as np
 import multiprocessing as mp
@@ -32,7 +31,7 @@ def different(a, b):
 
 #counter = counters[v]
 #connected_counters = all counters[w] for v -> w
-def func(v, counter, connected_counters):
+def updateCounters(v, counter, connected_counters):
     a = counter.copy()
     for c in connected_counters:
         a = union(c, a) 
@@ -110,7 +109,7 @@ class Hyperball:
         while (not finished):
             result = []
 
-            result = pool.starmap(func, [(v, self.counters[v], [self.counters[w] for w in E.get(v, set())]) for v in V])
+            result = pool.starmap(updateCounters, [(v, self.counters[v], [self.counters[w] for w in E.get(v, set())]) for v in V])
 
             t += 1
 
