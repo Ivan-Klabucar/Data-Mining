@@ -7,21 +7,17 @@ import multiprocessing as mp
 def union(M, N):
     duplicateKeys = set(M.M.keys()).intersection(set(N.M.keys()))
     unionHyperloglogCounter = HyperloglogCounter()
-    if len(M.M.keys()) == len(duplicateKeys):
-        maxCounts = [(k, max(M.M[k], N.M[k])) for k in duplicateKeys]
-        unionHyperloglogCounter.M.update(maxCounts)
-        return unionHyperloglogCounter
-    else:
-        maxCounts = [(k, max(M.M[k], N.M[k])) for k in duplicateKeys]
-        unionHyperloglogCounter.M.update(M.M)
-        unionHyperloglogCounter.M.update(N.M)
-        unionHyperloglogCounter.M.update(maxCounts)
-        return unionHyperloglogCounter
+    maxCounts = [(k, max(M.M[k], N.M[k])) for k in duplicateKeys]
+    unionHyperloglogCounter.M.update(M.M)
+    unionHyperloglogCounter.M.update(N.M)
+    unionHyperloglogCounter.M.update(maxCounts)
+    return unionHyperloglogCounter
 
 
 def different(a, b):
     duplicateKeys = set(a.M.keys()).intersection(set(b.M.keys()))
     if len(a.M.keys()) != len(duplicateKeys): return True
+    if len(b.M.keys()) != len(duplicateKeys): return True
     different = False
     for k in duplicateKeys:
         if a.M[k] != b.M[k]:
@@ -41,9 +37,9 @@ def updateCounters(v, counter, connected_counters):
 
 class HyperloglogCounter:
     def __init__(self):
-        self.b = 4
+        self.b = 6
         self.p = 2**self.b
-        self.alpha = 0.673 # https://en.wikipedia.org/wiki/HyperLogLog#Algorithm
+        self.alpha = 0.709 # https://en.wikipedia.org/wiki/HyperLogLog#Algorithm
         self.M = dict()
 
     #return h_p as an integer and h^p as binaryString
@@ -93,6 +89,7 @@ class Hyperball:
         return counter
 
     # graph G is a dictionary of V -> W
+    # variable graph is a tuple of (set of vertices, dict of edges)
     def run(self, graph, centrality='h'):
         V, E = graph
         accum = dict()
@@ -131,10 +128,10 @@ class Hyperball:
         result = dict()
         if centrality == 'c':
             for v in V:
-                result[v] = (len(V) - 1) / accum[v] if accum[v] != 0 else "inf"
+                result[v] = 1 / accum[v] if accum[v] != 0 else 0
         else:
             for v in V:
-                result[v] = accum[v] / (len(V) - 1)
+                result[v] = accum[v]
 
         return result
 
