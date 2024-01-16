@@ -1,0 +1,4 @@
+We removed all of the graphs from the code/graphs directory because off the excessive size of the datasets.
+
+To run the algorithm, prior to running the run.sh script, put the desired graph files in 
+the /graph directory.
