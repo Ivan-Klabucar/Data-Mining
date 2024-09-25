@@ -1,3 +1,5 @@
-# Data Mining
+# Data Mining – ID2222
 
-Lab solutions
+### KTH Royal Institute of Technology in Stockholm
+
+Laboratory exercise solutions.
